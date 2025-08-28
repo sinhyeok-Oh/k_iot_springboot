@@ -1,12 +1,17 @@
 package com.example.k5_iot_springboot.entity;
 
 import com.example.k5_iot_springboot.common.enums.Gender;
+import com.example.k5_iot_springboot.common.enums.RoleType;
 import com.example.k5_iot_springboot.entity.base.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * User 엔티티
  * - 테이블(users)와 1:1 매핑
@@ -17,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(
         name = "users",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_users_email", columnNames = "emaul"),
+                @UniqueConstraint(name = "uk_users_login_id", columnNames = "login_id"),
                 @UniqueConstraint(name = "uk_users_email", columnNames = "email"),
                 @UniqueConstraint(name = "uk_users_nickname", columnNames = "nickname")
         }
@@ -45,33 +50,48 @@ public class G_User extends BaseTimeEntity {
     @Column(name = "email", nullable = false, length = 255)
     private String email;
 
-    /** 닉네임( 유니크) */
+    /** 닉네임 (유니크) */
     @Column(name = "nickname", nullable = false, length = 50)
     private String nickname;
 
-    /** 성별 (선택, NULL허용) */
+    /** 성별 (선택, NULL 허용) */
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", length = 20)
     private Gender gender;
 
+    /** 여러 권한 보유 */
+    @ElementCollection(fetch = FetchType.LAZY) // JWT에 roles를 저장하는 구조 - LAZY 가능
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user_roles_user"))
+            ,
+            uniqueConstraints = @UniqueConstraint(name = "uk_user_roles", columnNames = {"user_id", "role"})
+    )
+    @Column(name = "role", length = 30, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Set<RoleType> roles = new HashSet<>();
+
     /** 생성 편의 메서드 */
     @Builder
-    private G_User(String loginId, String password, String email, String nickname, Gender gender) {
+    private G_User(String loginId, String password, String email, String nickname, Gender gender, Set<RoleType> roles) {
         this.loginId = loginId;
         this.password = password;
         this.email = email;
         this.nickname = nickname;
         this.gender = gender;
+        this.roles = (roles == null || roles.isEmpty()) ? new HashSet<>(Set.of(RoleType.USER)) : roles;
     }
 
-    // === 필요 시 변경(수정) 메서드 === //
+    // === 변경(수정) 메서드 === //
     public void changePassword(String password) {
         this.password = password;
     }
 
-    //
     public void changeProfile(String nickname, Gender gender) {
         this.nickname = nickname;
         this.gender = gender;
     }
+
+    public void addRole(RoleType role) { this.roles.add(role); }
+    public void removeRole(RoleType role) { this.roles.remove(role); }
 }

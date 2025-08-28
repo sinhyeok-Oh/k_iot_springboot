@@ -1,3 +1,4 @@
+
 package com.example.k5_iot_springboot.handler;
 
 import com.example.k5_iot_springboot.common.enums.ErrorCode;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.naming.AuthenticationException;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +81,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResponseDto<Object>> handleValidation(MethodArgumentNotValidException e) {
         log.warn("Validation failed: {}", e.getMessage());
         return fail(ErrorCode.VALIDATION_ERROR, null, toFieldErrors(e));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ResponseDto<Object>> handleAuth(AuthenticationException e) {
+        log.warn("UnAuthorized: {}", e.getMessage());
+        return fail(ErrorCode.UNAUTHORIZED, null, null);
     }
 
     // === 403 Forbidden: 접근 거부 === //
