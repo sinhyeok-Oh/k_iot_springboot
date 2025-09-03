@@ -163,6 +163,22 @@ public class WebSecurityConfig {
                                     .requestMatchers(HttpMethod.PUT,    "/api/v1/boards/**").hasAnyRole("MANAGER", "ADMIN")
                                     .requestMatchers(HttpMethod.DELETE, "/api/v1/boards/**").hasAnyRole("ADMIN")
 
+
+                                    // articles 접근 제어
+                                    .requestMatchers(HttpMethod.GET,    "/api/v1/articles/**").permitAll()
+
+                                    //products  접근 제어
+                                    .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+                                    .requestMatchers(HttpMethod.POST, "/api/v1/products/**").hasRole("ADMIN")
+                                    .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").hasRole("ADMIN")
+
+                                    // stocks 접근 제어
+                                    .requestMatchers(HttpMethod.GET, "/api/v1/stocks/**").permitAll()
+                                    .requestMatchers(HttpMethod.POST, "/api/v1/stocks/**").hasAnyRole("ADMIN","MANAGER")
+                                    .requestMatchers(HttpMethod.PUT, "/api/v1/stocks/**").hasAnyRole("ADMIN","MANAGER")
+
+                                    // orders 접근 제어
+
                                     // ADMIN 전용 권한 관리 API
                                     .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 

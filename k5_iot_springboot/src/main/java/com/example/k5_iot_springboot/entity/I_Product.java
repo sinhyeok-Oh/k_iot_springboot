@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(
         name = "products",
-        indexes = { @Index(name = "idx_products_name", columnList = "name")},
-        uniqueConstraints = { @UniqueConstraint(name = "uq_products_name", columnNames = "name")}
+        indexes = { @Index(name = "idx_products_name", columnList = "name") },
+        uniqueConstraints = { @UniqueConstraint(name = "uq_products_name", columnNames = "name") }
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,4 +37,11 @@ public class I_Product extends BaseTimeEntity {
         this.price = price;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
 }
